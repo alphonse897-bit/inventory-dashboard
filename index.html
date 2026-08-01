@@ -235,7 +235,7 @@
 
 <script>
 /* ============ 原始数据 ============ */
-const SAMPLE_DATA = `📦 海外仓库存明细（7月31日）
+const SAMPLE_DATA = `📦 海外仓库存明细（8月1日）
 ━━━━━━━━━━━━━━━━
 
 【MY-02 马来仓】8个SKU
@@ -251,20 +251,20 @@ const SAMPLE_DATA = `📦 海外仓库存明细（7月31日）
 【PH-08 菲律宾仓】26个SKU
 1. CLICK风叶盖紫|PH-08|90
 2. CLICK风叶盖银|PH-08|84
-3. 上泵盖紫|PH-08|3
+3. 上泵盖紫|PH-08|0
 4. 上泵盖红|PH-08|45
 5. 上泵盖蓝|PH-08|43
 6. 上泵盖金|PH-08|1
-7. 上泵盖银|PH-08|29
+7. 上泵盖银|PH-08|25
 8. 上泵盖黑|PH-08|84
 9. 本田摇臂|PH-08|36
 10. 脚踏01银色|PH-08|49
-11. 铆钉紫|PH-08|96
+11. 铆钉紫|PH-08|92
 12. 铆钉红|PH-08|23
 13. 铆钉绿|PH-08|23
 14. 铆钉蓝|PH-08|32
 15. 铆钉金|PH-08|28
-16. 铆钉银|PH-08|66
+16. 铆钉银|PH-08|63
 17. 铆钉黑|PH-08|0
 18. 雅马哈摇臂|PH-08|10
 19. 风叶盖炫彩|PH-08|34
@@ -302,124 +302,9 @@ const SAMPLE_DATA = `📦 海外仓库存明细（7月31日）
 23. 风叶盖黑|TH-08|41
 
 ━━━━━━━━━━━━━━━━
-📊 总计：57个SKU | 可用2570个`;
+📊 总计：57个SKU | 可用2556个
 
-/* ============ 解析器 ============ */
-function parseInput(text){
-  const m = {date:'', warehouses:[], total:{skuCount:0,itemCount:0,dailyChange:null}};
-
-  const dM = text.match(/(\d{1,2})月(\d{1,2})日/);
-  if(dM) m.date = `${dM[1]}月${dM[2]}日`;
-
-  const tM = text.match(/总计[：:]\s*(\d+)\s*个\s*SKU[，, \|]+\D*(\d+)\s*[件个]/);
-  if(tM){
-    m.total.skuCount = +tM[1];
-    m.total.itemCount = +tM[2];
-  }
-  const dcM = text.match(/日环比\s*([+-]?\d+)\s*件/);
-  if(dcM) m.total.dailyChange = +dcM[1];
-
-  const lines = text.split(/\r?\n/);
-  let cur = null;
-  const whRe = /【\s*([^\s】]+)\s+([^】]+?)\s*】\s*(\d+)\s*个\s*SKU(?:[，,]\s*(\d+)\s*件)?/;
-  const itOld = /^\s*\d+\s*[\.、]\s*(.+?)\s*[：:]\s*(\d+)\s*件(.*)$/;
-  const itNew = /^\s*\d+\s*[\.、]\s*(.+?)\s*\|\s*[A-Z]+-\d+\s*\|\s*(\d+)\s*$/;
-
-  for(const line of lines){
-    const wM = line.match(whRe);
-    if(wM){
-      cur = {code:wM[1].trim(), name:wM[2].trim(), skuCount:+wM[3], itemCount:wM[4]?+wM[4]:0, items:[]};
-      m.warehouses.push(cur);
-      continue;
-    }
-    const iO = line.match(itOld);
-    if(iO && cur){
-      const qty = +iO[2];
-      let alert = null;
-      const rest = iO[3]||'';
-      if(rest.includes('断货') || qty===0) alert = '断货';
-      else if(rest.includes('低库存')) alert = '低库存';
-      cur.items.push({name:iO[1].trim(), qty, alert});
-      continue;
-    }
-    const iN = line.match(itNew);
-    if(iN && cur){
-      cur.items.push({name:iN[1].trim(), qty:+iN[2], alert:null});
-    }
-  }
-
-  const outB = text.match(/断货预警[：:]\s*(.+)/);
-  if(outB) applyAlerts(outB[1], '断货', m);
-  const lowB = text.match(/低库存[：:]\s*(.+)/);
-  if(lowB) applyAlerts(lowB[1], '低库存', m);
-
-  m.warehouses.forEach(w=>w.items.forEach(i=>{
-    if(!i.alert && i.qty===0) i.alert = '断货';
-  }));
-
-  m.warehouses.forEach(w=>{
-    if(!w.itemCount) w.itemCount = w.items.reduce((s,i)=>s+i.qty,0);
-  });
-  if(!m.total.skuCount){
-    m.total.skuCount = m.warehouses.reduce((s,w)=>s+w.items.length,0);
-    m.total.itemCount = m.warehouses.reduce((s,w)=>s+w.itemCount,0);
-  }
-
-  return m;
-}
-
-function applyAlerts(line, level, model){
-  const parts = line.split(/[、,，]/);
-  parts.forEach(p=>{
-    const m2 = p.trim().match(/^([A-Z]+-\d+)(.+?)(?:\s*(\d+)件)?$/);
-    if(!m2) return;
-    const whCode = m2[1], itemName = m2[2].trim();
-    const wh = model.warehouses.find(w=>w.code===whCode);
-    if(!wh) return;
-    let item = wh.items.find(i=>i.name===itemName);
-    if(!item) item = wh.items.find(i=>i.name.replace(/^\d+件?/,'')===itemName.replace(/^\d+件?/,'') || i.name.startsWith(itemName) || itemName.startsWith(i.name));
-    if(item && !item.alert) item.alert = level;
-  });
-}
-
-/* ============ 状态 ============ */
-let MODEL = parseInput(SAMPLE_DATA);
-let activeFilter = 'all';
-
-/* ============ 工具 ============ */
-const fmt = n => n.toLocaleString('zh-CN');
-const $ = s => document.querySelector(s);
-const esc = s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-function renderHead(){
-  $('#hd-date').textContent = MODEL.date ? `${MODEL.date} 日报` : '—';
-  const now = new Date();
-  const t = now.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-  $('#hd-update').innerHTML = `<span class="dot" style="background:#6366f1"></span>看板更新 ${t}`;
-  $('#hd-sub').textContent = `${MODEL.warehouses.length} 个仓库 · ${MODEL.total.skuCount} 个SKU · ${fmt(MODEL.total.itemCount)} 件`;
-}
-
-function renderKPIs(){
-  const ws = MODEL.warehouses;
-  const allItems = ws.flatMap(w=>w.items.map(i=>({...i,wh:w.name,code:w.code})));
-  const outC = allItems.filter(i=>i.alert==='断货').length;
-  const lowC = allItems.filter(i=>i.alert==='低库存').length;
-  const alertC = outC + lowC;
-  const dc = MODEL.total.dailyChange;
-  const dcSign = dc===null?'':(dc>0?`+${dc}`:`${dc}`);
-  const dcClass = dc===null?'zero':(dc<0?'neg':(dc>0?'pos':'zero'));
-
-  const cards = [
-    {lbl:'总SKU数', val:fmt(MODEL.total.skuCount), icon:'🏷️', bg:'var(--primary-soft)',fg:'var(--primary)',
-     foot:`<span>分布于 ${ws.length} 个仓库</span>`},
-    {lbl:'总库存件数', val:fmt(MODEL.total.itemCount), icon:'📦', bg:'var(--ok-soft)',fg:'#059669',
-     foot: dc===null?`<span>无环比数据</span>`:`<span>日环比</span><span class="delta ${dcClass}">${dcSign} 件</span>`},
-    {lbl:'仓库数量', val:ws.length, icon:'🏭', bg:'#eff6ff',fg:'#2563eb',
-     foot:`<span>${ws.map(w=>w.code).join(' / ')}</span>`},
-    {lbl:'预警SKU', val:fmt(alertC), icon:'⚠️', bg: alertC? 'var(--danger-soft)':'var(--ok-soft)',fg: alertC?'#dc2626':'#059669',
-     foot:`<span>断货 <b style="color:#dc2626">${outC}</b> · 低库存 <b style="color:#b45309">${lowC}</b></span>`}
-  ];
-  $('#kpis').innerHTML = cards.map(c=>`
+📊 实时看板：https://alphonse897-bit.github.io/inventory-dashboard/`
     <div class="kpi">
       <div class="ic" style="background:${c.bg};color:${c.fg}">${c.icon}</div>
       <div class="lbl">${c.lbl}</div>
