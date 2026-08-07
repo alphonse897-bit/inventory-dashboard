@@ -2,149 +2,599 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>海外仓库存看板 - 2026年08月06日</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4f46e5">
+<title>库存日报看板 - TikTok Shop</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-.container { max-width: 1200px; margin: 0 auto; }
-.header { background: rgba(255,255,255,0.95); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
-.header h1 { font-size: 24px; color: #1a1a2e; margin-bottom: 8px; }
-.header .date { color: #666; font-size: 14px; }
-.summary { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
-.summary-card { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 16px 24px; border-radius: 12px; flex: 1; min-width: 150px; }
-.summary-card .label { font-size: 12px; opacity: 0.8; }
-.summary-card .value { font-size: 28px; font-weight: bold; margin-top: 4px; }
-.warehouse { background: rgba(255,255,255,0.95); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
-.warehouse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; }
-.warehouse-header h2 { font-size: 18px; color: #1a1a2e; }
-.warehouse-header .badge { background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; }
-table { width: 100%; border-collapse: collapse; }
-th { background: #f8f9fa; padding: 10px 12px; text-align: left; font-size: 13px; color: #666; font-weight: 600; border-bottom: 2px solid #e9ecef; }
-td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333; }
-tr:hover { background: #f8f9fa; }
-.stock-low { color: #e74c3c; font-weight: bold; }
-.stock-mid { color: #f39c12; font-weight: bold; }
-.stock-ok { color: #27ae60; }
-.footer { text-align: center; color: rgba(255,255,255,0.7); font-size: 12px; padding: 20px; }
-@media (max-width: 768px) {
-  .summary { flex-direction: column; }
-  table { font-size: 12px; }
-  th, td { padding: 8px 6px; }
-}
+  :root{
+    --bg:#eef1f6; --card:#ffffff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --primary:#4f46e5; --primary-soft:#eef2ff; --danger:#ef4444; --danger-soft:#fef2f2;
+    --warn:#f59e0b; --warn-soft:#fffbeb; --ok:#10b981; --ok-soft:#ecfdf5;
+    --radius:14px; --shadow:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04);
+    --shadow-lg:0 10px 30px -10px rgba(16,24,40,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;padding:24px 20px 60px;
+    overflow-x:hidden}
+  .wrap{max-width:1240px;width:100%;margin:0 auto;min-width:0}
+
+  .head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:22px}
+  .head .tit{display:flex;align-items:center;gap:12px}
+  .head h1{font-size:22px;font-weight:700;letter-spacing:.2px}
+  .head .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:var(--shadow-lg)}
+  .meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);
+    padding:7px 13px;border-radius:999px;font-size:13px;font-weight:500;box-shadow:var(--shadow)}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+  .btn{cursor:pointer;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;
+    background:var(--primary);color:#fff;transition:.15s;box-shadow:var(--shadow)}
+  .btn:hover{background:#4338ca;transform:translateY(-1px)}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{background:#f9fafb}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:22px}
+  .kpis>*{min-width:0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;min-width:0}
+  .kpi .ic{position:absolute;right:14px;top:14px;width:36px;height:36px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-size:18px}
+  .kpi .lbl{color:var(--muted);font-size:12.5px;font-weight:500}
+  .kpi .val{font-size:30px;font-weight:800;margin-top:4px;letter-spacing:-.5px}
+  .kpi .foot{font-size:12px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px}
+  .delta{font-weight:700}
+  .delta.neg{color:var(--danger)} .delta.pos{color:var(--ok)} .delta.zero{color:var(--muted)}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;margin-bottom:16px}
+  .grid2>*,.grid3>*{min-width:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px 20px;min-width:0}
+  .card h2{font-size:14.5px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card h2 .n{color:var(--muted);font-weight:500;font-size:12.5px}
+
+  .whbar{margin:10px 0}
+  .whbar .top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+  .whbar .nm{font-weight:600}
+  .whbar .vs{color:var(--muted)}
+  .track{height:26px;background:#f3f4f6;border-radius:7px;overflow:hidden}
+  .fill{height:100%;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;
+    padding-right:9px;color:#fff;font-size:12px;font-weight:700;transition:width .8s cubic-bezier(.4,0,.2,1)}
+  .whbar .sub{display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-top:4px}
+  .whbar .sub b{color:var(--ink)}
+
+  .donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .donut{position:relative;width:130px;height:130px}
+  .donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut .center .n{font-size:24px;font-weight:800}
+  .donut .center .t{font-size:11px;color:var(--muted)}
+  .legend{display:flex;flex-direction:column;gap:9px;flex:1;min-width:120px}
+  .legend .row{display:flex;align-items:center;justify-content:space-between;font-size:13px;gap:10px}
+  .legend .l{display:flex;align-items:center;gap:8px}
+  .legend .sq{width:11px;height:11px;border-radius:3px}
+  .legend .num{font-weight:700}
+
+  .alert-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .alert-box{border-radius:11px;padding:14px 16px;border:1px solid}
+  .alert-box.out{background:var(--danger-soft);border-color:#fecaca}
+  .alert-box.low{background:var(--warn-soft);border-color:#fde68a}
+  .alert-box .ht{font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .alert-box.out .ht{color:#b91c1c} .alert-box.low .ht{color:#b45309}
+  .alert-box .cnt{background:rgba(255,255,255,.7);border-radius:999px;padding:2px 9px;font-size:12px}
+  .alert-list{display:flex;flex-direction:column;gap:7px;max-height:200px;overflow:auto}
+  .alert-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.6);
+    border-radius:8px;padding:7px 11px;font-size:12.5px}
+  .alert-item .wn{color:var(--muted);font-size:11px}
+  .alert-item .qn{font-weight:700}
+  .empty-note{font-size:12.5px;color:var(--muted);padding:4px 2px}
+
+  .wh-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .wh-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#fafbff,#fff)}
+  .wh-head .lt{display:flex;align-items:center;gap:9px}
+  .wh-head .code{font-size:11px;font-weight:700;background:var(--primary-soft);color:var(--primary);
+    padding:3px 8px;border-radius:6px}
+  .wh-head .nm{font-weight:700;font-size:14.5px}
+  .wh-head .rt{font-size:12px;color:var(--muted)}
+  .wh-head .rt b{color:var(--ink)}
+  .tbl-wrap{overflow:auto;max-height:420px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:9px 16px;text-align:left;white-space:nowrap}
+  thead th{position:sticky;top:0;background:#f9fafb;font-weight:600;color:var(--muted);font-size:12px;
+    border-bottom:1px solid var(--line);z-index:1}
+  tbody tr{border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:#f9fafb}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+  .badge.out{background:var(--danger-soft);color:#b91c1c}
+  .badge.low{background:var(--warn-soft);color:#b45309}
+  .badge.ok{background:var(--ok-soft);color:#047857}
+  .bar-mini{width:60px;height:6px;background:#eef0f3;border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px}
+  .bar-mini i{display:block;height:100%;border-radius:3px}
+
+  .toolbar{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .search{flex:1;min-width:180px;position:relative}
+  .search input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--line);border-radius:9px;font-size:13px;outline:none}
+  .search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .search .si{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+  .chip{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);cursor:pointer;
+    background:#fff;font-weight:600;color:var(--muted);transition:.15s}
+  .chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .chip:hover:not(.active){border-color:#cbd5e1}
+
+  .matrix-wrap{overflow:auto;max-height:520px}
+
+  .data-panel{margin-top:22px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);
+    box-shadow:var(--shadow);overflow:hidden}
+  .dp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;user-select:none;
+    background:linear-gradient(180deg,#fafbff,#fff)}
+  .dp-head .lt{display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px}
+  .dp-head .lt .hint{font-weight:500;color:var(--muted);font-size:12.5px}
+  .dp-head .chev{transition:.25s;color:var(--muted)}
+  .data-panel.open .chev{transform:rotate(180deg)}
+  .dp-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .data-panel.open .dp-body{max-height:1400px}
+  .dp-inner{padding:16px 18px;border-top:1px solid var(--line)}
+  .dp-inner textarea{width:100%;height:230px;font-family:"Consolas","SF Mono",Menlo,monospace;font-size:12.5px;
+    border:1px solid var(--line);border-radius:10px;padding:12px 14px;resize:vertical;outline:none;line-height:1.6}
+  .dp-inner textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .dp-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  .dp-status{font-size:12.5px;color:var(--muted);margin-left:auto}
+  .dp-status.ok{color:var(--ok)} .dp-status.err{color:var(--danger)}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:#1f2937;color:#fff;
+    padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);transition:.3s;z-index:50}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .sec{margin-bottom:16px}
+  .nores{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+  @media(max-width:520px){
+    body{padding:18px 12px 40px}
+    .kpi .val{font-size:26px}
+    .head h1{font-size:19px}
+    .head .sub{font-size:12px}
+  }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-  <h1>📦 海外仓实时库存看板</h1>
-  <div class="date">📅 数据更新时间：2026年08月06日 19:15</div>
-  <div class="summary">
-    <div class="summary-card">
-      <div class="label">总SKU数</div>
-      <div class="value">59</div>
+<noscript><div style="padding:20px;background:#fee2e2;color:#991b1b;text-align:center;font-weight:600;">请启用 JavaScript 以使用库存日报看板。</div></noscript>
+<div class="wrap">
+  <div class="head">
+    <div class="tit">
+      <div class="logo">📦</div>
+      <div>
+        <h1>库存日报看板</h1>
+        <div class="sub" id="hd-sub">TikTok Shop 多仓库存监控 · 实时预警</div>
+      </div>
     </div>
-    <div class="summary-card">
-      <div class="label">可用库存</div>
-      <div class="value">2750</div>
+    <div class="meta">
+      <span class="pill"><span class="dot"></span><span id="hd-date">—</span></span>
+      <span class="pill" id="hd-update">—</span>
+      <button class="btn ghost" id="btn-export">导出 JSON</button>
     </div>
-    <div class="summary-card">
-      <div class="label">仓库数量</div>
-      <div class="value">3</div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>各仓库库存总量 <span class="n">按件数</span></h2>
+      <div id="wh-chart"></div>
+    </div>
+    <div class="card">
+      <h2>库存健康度 <span class="n">按SKU数</span></h2>
+      <div class="donut-wrap" id="health"></div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <h2>库存预警 <span class="n">需关注</span></h2>
+    <div class="alert-grid" id="alerts"></div>
+  </div>
+
+  <div class="sec">
+    <div class="toolbar">
+      <div class="search">
+        <span class="si">🔍</span>
+        <input id="search" type="text" placeholder="搜索SKU名称（跨所有仓库）...">
+      </div>
+      <div id="chips"></div>
+    </div>
+    <div id="wh-tables"></div>
+  </div>
+
+  <div class="card sec">
+    <h2>跨仓SKU汇总 <span class="n">同一SKU在不同仓库的分布</span></h2>
+    <div class="matrix-wrap">
+      <table id="matrix">
+        <thead><tr><th>SKU名称</th><th class="num">总库存</th><th class="num">覆盖仓数</th><th>分布</th><th>状态</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="data-panel" id="data-panel">
+    <div class="dp-head" id="dp-toggle">
+      <div class="lt">⚙️ 数据更新 <span class="hint">粘贴日报文本即可自动刷新看板</span></div>
+      <span class="chev">▾</span>
+    </div>
+    <div class="dp-body">
+      <div class="dp-inner">
+        <textarea id="raw-input" placeholder="在此粘贴完整日报文本（格式：📦 X月X日库存日报 … 【仓码 仓名】N个SKU，N件 … N. SKU名：N件 ⚠️断货/低库存 …  总计：…）"></textarea>
+        <div class="dp-actions">
+          <button class="btn" id="btn-update">更新看板</button>
+          <button class="btn ghost" id="btn-load">载入示例</button>
+          <span class="dp-status" id="dp-status"></span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="warehouse">
-  <div class="warehouse-header">
-    <h2>🇲🇾 MY-02 马来仓</h2>
-    <span class="badge">10 SKU | 可用 461</span>
-  </div>
-  <table>
-    <tr><th>#</th><th>商品名称</th><th>可用库存</th><th>在库</th><th>状态</th></tr>
-    <tr><td>1</td><td>本田摇臂</td><td class="stock-ok">25</td><td>25</td><td>✅ 正常</td></tr>
-    <tr><td>2</td><td>雅马哈摇臂</td><td class="stock-ok">25</td><td>25</td><td>✅ 正常</td></tr>
-    <tr><td>3</td><td>风叶盖炫彩</td><td class="stock-ok">52</td><td>52</td><td>✅ 正常</td></tr>
-    <tr><td>4</td><td>风叶盖紫</td><td class="stock-ok">97</td><td>97</td><td>✅ 正常</td></tr>
-    <tr><td>5</td><td>风叶盖红</td><td class="stock-ok">51</td><td>51</td><td>✅ 正常</td></tr>
-    <tr><td>6</td><td>风叶盖绿</td><td class="stock-low">1</td><td>1</td><td>️ 紧急</td></tr>
-    <tr><td>7</td><td>风叶盖蓝</td><td class="stock-ok">17</td><td>17</td><td>✅ 正常</td></tr>
-    <tr><td>8</td><td>风叶盖金</td><td class="stock-ok">34</td><td>34</td><td>✅ 正常</td></tr>
-    <tr><td>9</td><td>风叶盖银</td><td class="stock-ok">77</td><td>77</td><td>✅ 正常</td></tr>
-    <tr><td>10</td><td>风叶盖黑</td><td class="stock-ok">82</td><td>82</td><td>✅ 正常</td></tr>
-  </table>
-</div>
-<div class="warehouse">
-  <div class="warehouse-header">
-    <h2>🇵🇭 PH-08 菲律宾仓</h2>
-    <span class="badge">26 SKU | 可用 1378</span>
-  </div>
-  <table>
-    <tr><th>#</th><th>商品名称</th><th>可用库存</th><th>在库</th><th>状态</th></tr>
-    <tr><td>1</td><td>CLICK风叶盖紫</td><td class="stock-ok">90</td><td>90</td><td>✅ 正常</td></tr>
-    <tr><td>2</td><td>CLICK风叶盖银</td><td class="stock-ok">83</td><td>83</td><td>✅ 正常</td></tr>
-    <tr><td>3</td><td>上泵盖紫</td><td class="stock-mid">2</td><td>2</td><td>📉 偏低</td></tr>
-    <tr><td>4</td><td>上泵盖红</td><td class="stock-ok">42</td><td>42</td><td>✅ 正常</td></tr>
-    <tr><td>5</td><td>上泵盖蓝</td><td class="stock-ok">45</td><td>45</td><td>✅ 正常</td></tr>
-    <tr><td>6</td><td>上泵盖金</td><td class="stock-low">0</td><td>0</td><td>️ 紧急</td></tr>
-    <tr><td>7</td><td>上泵盖银</td><td class="stock-ok">16</td><td>16</td><td>✅ 正常</td></tr>
-    <tr><td>8</td><td>上泵盖黑</td><td class="stock-ok">81</td><td>81</td><td>✅ 正常</td></tr>
-    <tr><td>9</td><td>本田摇臂</td><td class="stock-ok">31</td><td>31</td><td>✅ 正常</td></tr>
-    <tr><td>10</td><td>脚踏01银色</td><td class="stock-ok">49</td><td>49</td><td>✅ 正常</td></tr>
-    <tr><td>11</td><td>铆钉紫</td><td class="stock-ok">76</td><td>76</td><td>✅ 正常</td></tr>
-    <tr><td>12</td><td>铆钉红</td><td class="stock-ok">22</td><td>22</td><td>✅ 正常</td></tr>
-    <tr><td>13</td><td>铆钉绿</td><td class="stock-ok">20</td><td>20</td><td>✅ 正常</td></tr>
-    <tr><td>14</td><td>铆钉蓝</td><td class="stock-ok">31</td><td>31</td><td>✅ 正常</td></tr>
-    <tr><td>15</td><td>铆钉金</td><td class="stock-ok">27</td><td>27</td><td>✅ 正常</td></tr>
-    <tr><td>16</td><td>铆钉银</td><td class="stock-ok">60</td><td>60</td><td>✅ 正常</td></tr>
-    <tr><td>17</td><td>铆钉黑</td><td class="stock-low">0</td><td>0</td><td>️ 紧急</td></tr>
-    <tr><td>18</td><td>雅马哈摇臂</td><td class="stock-mid">10</td><td>10</td><td>📉 偏低</td></tr>
-    <tr><td>19</td><td>风叶盖炫彩</td><td class="stock-ok">30</td><td>30</td><td>✅ 正常</td></tr>
-    <tr><td>20</td><td>风叶盖紫</td><td class="stock-ok">187</td><td>187</td><td>✅ 正常</td></tr>
-    <tr><td>21</td><td>风叶盖红</td><td class="stock-ok">79</td><td>79</td><td>✅ 正常</td></tr>
-    <tr><td>22</td><td>风叶盖绿</td><td class="stock-ok">60</td><td>60</td><td>✅ 正常</td></tr>
-    <tr><td>23</td><td>风叶盖蓝</td><td class="stock-ok">85</td><td>85</td><td>✅ 正常</td></tr>
-    <tr><td>24</td><td>风叶盖金</td><td class="stock-ok">47</td><td>47</td><td>✅ 正常</td></tr>
-    <tr><td>25</td><td>风叶盖银</td><td class="stock-ok">159</td><td>159</td><td>✅ 正常</td></tr>
-    <tr><td>26</td><td>风叶盖黑</td><td class="stock-ok">46</td><td>46</td><td>✅ 正常</td></tr>
-  </table>
-</div>
-<div class="warehouse">
-  <div class="warehouse-header">
-    <h2>🇹🇭 TH-08 泰国仓</h2>
-    <span class="badge">23 SKU | 可用 911</span>
-  </div>
-  <table>
-    <tr><th>#</th><th>商品名称</th><th>可用库存</th><th>在库</th><th>状态</th></tr>
-    <tr><td>1</td><td>上泵盖紫</td><td class="stock-ok">33</td><td>33</td><td>✅ 正常</td></tr>
-    <tr><td>2</td><td>上泵盖红</td><td class="stock-ok">33</td><td>33</td><td>✅ 正常</td></tr>
-    <tr><td>3</td><td>上泵盖绿</td><td class="stock-ok">49</td><td>49</td><td>✅ 正常</td></tr>
-    <tr><td>4</td><td>上泵盖蓝</td><td class="stock-ok">30</td><td>30</td><td>✅ 正常</td></tr>
-    <tr><td>5</td><td>上泵盖金</td><td class="stock-ok">33</td><td>33</td><td>✅ 正常</td></tr>
-    <tr><td>6</td><td>上泵盖银</td><td class="stock-ok">46</td><td>46</td><td>✅ 正常</td></tr>
-    <tr><td>7</td><td>上泵盖黑</td><td class="stock-ok">49</td><td>49</td><td>✅ 正常</td></tr>
-    <tr><td>8</td><td>脚踏01银色</td><td class="stock-ok">49</td><td>49</td><td>✅ 正常</td></tr>
-    <tr><td>9</td><td>铆钉紫</td><td class="stock-ok">41</td><td>41</td><td>✅ 正常</td></tr>
-    <tr><td>10</td><td>铆钉红</td><td class="stock-ok">15</td><td>15</td><td>✅ 正常</td></tr>
-    <tr><td>11</td><td>铆钉绿</td><td class="stock-ok">22</td><td>22</td><td>✅ 正常</td></tr>
-    <tr><td>12</td><td>铆钉蓝</td><td class="stock-ok">13</td><td>13</td><td>✅ 正常</td></tr>
-    <tr><td>13</td><td>铆钉金</td><td class="stock-ok">16</td><td>16</td><td>✅ 正常</td></tr>
-    <tr><td>14</td><td>铆钉银</td><td class="stock-ok">36</td><td>36</td><td>✅ 正常</td></tr>
-    <tr><td>15</td><td>铆钉黑</td><td class="stock-ok">16</td><td>16</td><td>✅ 正常</td></tr>
-    <tr><td>16</td><td>风叶盖炫彩</td><td class="stock-ok">32</td><td>32</td><td>✅ 正常</td></tr>
-    <tr><td>17</td><td>风叶盖紫</td><td class="stock-ok">85</td><td>85</td><td>✅ 正常</td></tr>
-    <tr><td>18</td><td>风叶盖红</td><td class="stock-ok">76</td><td>76</td><td>✅ 正常</td></tr>
-    <tr><td>19</td><td>风叶盖绿</td><td class="stock-ok">55</td><td>55</td><td>✅ 正常</td></tr>
-    <tr><td>20</td><td>风叶盖蓝</td><td class="stock-ok">42</td><td>42</td><td>✅ 正常</td></tr>
-    <tr><td>21</td><td>风叶盖金</td><td class="stock-ok">62</td><td>62</td><td>✅ 正常</td></tr>
-    <tr><td>22</td><td>风叶盖银</td><td class="stock-ok">41</td><td>41</td><td>✅ 正常</td></tr>
-    <tr><td>23</td><td>风叶盖黑</td><td class="stock-ok">37</td><td>37</td><td>✅ 正常</td></tr>
-  </table>
-</div>
+<div class="toast" id="toast"></div>
 
-<div class="footer">
-  📦 海外仓库存看板 · 每日自动更新 · Powered by 蓓蓓
-</div>
-</div>
+<script>
+/* ============ 原始数据 ============ */
+const SAMPLE_DATA = `📦 海外仓库存明细（7月31日）
+━━━━━━━━━━━━━━━━
+
+【MY-02 马来仓】8个SKU
+1. 风叶盖炫彩|MY-02|32
+2. 风叶盖紫|MY-02|0
+3. 风叶盖红|MY-02|1
+4. 风叶盖绿|MY-02|2
+5. 风叶盖蓝|MY-02|22
+6. 风叶盖金|MY-02|22
+7. 风叶盖银|MY-02|48
+8. 风叶盖黑|MY-02|43
+
+【PH-08 菲律宾仓】26个SKU
+1. CLICK风叶盖紫|PH-08|90
+2. CLICK风叶盖银|PH-08|84
+3. 上泵盖紫|PH-08|3
+4. 上泵盖红|PH-08|45
+5. 上泵盖蓝|PH-08|43
+6. 上泵盖金|PH-08|1
+7. 上泵盖银|PH-08|29
+8. 上泵盖黑|PH-08|84
+9. 本田摇臂|PH-08|36
+10. 脚踏01银色|PH-08|49
+11. 铆钉紫|PH-08|96
+12. 铆钉红|PH-08|23
+13. 铆钉绿|PH-08|23
+14. 铆钉蓝|PH-08|32
+15. 铆钉金|PH-08|28
+16. 铆钉银|PH-08|66
+17. 铆钉黑|PH-08|0
+18. 雅马哈摇臂|PH-08|10
+19. 风叶盖炫彩|PH-08|34
+20. 风叶盖紫|PH-08|203
+21. 风叶盖红|PH-08|81
+22. 风叶盖绿|PH-08|61
+23. 风叶盖蓝|PH-08|87
+24. 风叶盖金|PH-08|49
+25. 风叶盖银|PH-08|156
+26. 风叶盖黑|PH-08|50
+
+【TH-08 泰国仓】23个SKU
+1. 上泵盖紫|TH-08|34
+2. 上泵盖红|TH-08|32
+3. 上泵盖绿|TH-08|49
+4. 上泵盖蓝|TH-08|31
+5. 上泵盖金|TH-08|33
+6. 上泵盖银|TH-08|46
+7. 上泵盖黑|TH-08|49
+8. 脚踏01银色|TH-08|49
+9. 铆钉紫|TH-08|41
+10. 铆钉红|TH-08|15
+11. 铆钉绿|TH-08|22
+12. 铆钉蓝|TH-08|13
+13. 铆钉金|TH-08|16
+14. 铆钉银|TH-08|36
+15. 铆钉黑|TH-08|16
+16. 风叶盖炫彩|TH-08|34
+17. 风叶盖紫|TH-08|93
+18. 风叶盖红|TH-08|77
+19. 风叶盖绿|TH-08|58
+20. 风叶盖蓝|TH-08|46
+21. 风叶盖金|TH-08|62
+22. 风叶盖银|TH-08|44
+23. 风叶盖黑|TH-08|41
+
+━━━━━━━━━━━━━━━━
+📊 总计：57个SKU | 可用2570个`;
+
+/* ============ 解析器 ============ */
+function parseInput(text){
+  const m = {date:'', warehouses:[], total:{skuCount:0,itemCount:0,dailyChange:null}};
+
+  const dM = text.match(/(\d{1,2})月(\d{1,2})日/);
+  if(dM) m.date = `${dM[1]}月${dM[2]}日`;
+
+  const tM = text.match(/总计[：:]\s*(\d+)\s*个\s*SKU[，, \|]+\D*(\d+)\s*[件个]/);
+  if(tM){
+    m.total.skuCount = +tM[1];
+    m.total.itemCount = +tM[2];
+  }
+  const dcM = text.match(/日环比\s*([+-]?\d+)\s*件/);
+  if(dcM) m.total.dailyChange = +dcM[1];
+
+  const lines = text.split(/\r?\n/);
+  let cur = null;
+  const whRe = /【\s*([^\s】]+)\s+([^】]+?)\s*】\s*(\d+)\s*个\s*SKU(?:[，,]\s*(\d+)\s*件)?/;
+  const itOld = /^\s*\d+\s*[\.、]\s*(.+?)\s*[：:]\s*(\d+)\s*件(.*)$/;
+  const itNew = /^\s*\d+\s*[\.、]\s*(.+?)\s*\|\s*[A-Z]+-\d+\s*\|\s*(\d+)\s*$/;
+
+  for(const line of lines){
+    const wM = line.match(whRe);
+    if(wM){
+      cur = {code:wM[1].trim(), name:wM[2].trim(), skuCount:+wM[3], itemCount:wM[4]?+wM[4]:0, items:[]};
+      m.warehouses.push(cur);
+      continue;
+    }
+    const iO = line.match(itOld);
+    if(iO && cur){
+      const qty = +iO[2];
+      let alert = null;
+      const rest = iO[3]||'';
+      if(rest.includes('断货') || qty===0) alert = '断货';
+      else if(rest.includes('低库存')) alert = '低库存';
+      cur.items.push({name:iO[1].trim(), qty, alert});
+      continue;
+    }
+    const iN = line.match(itNew);
+    if(iN && cur){
+      cur.items.push({name:iN[1].trim(), qty:+iN[2], alert:null});
+    }
+  }
+
+  const outB = text.match(/断货预警[：:]\s*(.+)/);
+  if(outB) applyAlerts(outB[1], '断货', m);
+  const lowB = text.match(/低库存[：:]\s*(.+)/);
+  if(lowB) applyAlerts(lowB[1], '低库存', m);
+
+  m.warehouses.forEach(w=>w.items.forEach(i=>{
+    if(!i.alert && i.qty===0) i.alert = '断货';
+  }));
+
+  m.warehouses.forEach(w=>{
+    if(!w.itemCount) w.itemCount = w.items.reduce((s,i)=>s+i.qty,0);
+  });
+  if(!m.total.skuCount){
+    m.total.skuCount = m.warehouses.reduce((s,w)=>s+w.items.length,0);
+    m.total.itemCount = m.warehouses.reduce((s,w)=>s+w.itemCount,0);
+  }
+
+  return m;
+}
+
+function applyAlerts(line, level, model){
+  const parts = line.split(/[、,，]/);
+  parts.forEach(p=>{
+    const m2 = p.trim().match(/^([A-Z]+-\d+)(.+?)(?:\s*(\d+)件)?$/);
+    if(!m2) return;
+    const whCode = m2[1], itemName = m2[2].trim();
+    const wh = model.warehouses.find(w=>w.code===whCode);
+    if(!wh) return;
+    let item = wh.items.find(i=>i.name===itemName);
+    if(!item) item = wh.items.find(i=>i.name.replace(/^\d+件?/,'')===itemName.replace(/^\d+件?/,'') || i.name.startsWith(itemName) || itemName.startsWith(i.name));
+    if(item && !item.alert) item.alert = level;
+  });
+}
+
+/* ============ 状态 ============ */
+let MODEL = parseInput(SAMPLE_DATA);
+let activeFilter = 'all';
+
+/* ============ 工具 ============ */
+const fmt = n => n.toLocaleString('zh-CN');
+const $ = s => document.querySelector(s);
+const esc = s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderHead(){
+  $('#hd-date').textContent = MODEL.date ? `${MODEL.date} 日报` : '—';
+  const now = new Date();
+  const t = now.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  $('#hd-update').innerHTML = `<span class="dot" style="background:#6366f1"></span>看板更新 ${t}`;
+  $('#hd-sub').textContent = `${MODEL.warehouses.length} 个仓库 · ${MODEL.total.skuCount} 个SKU · ${fmt(MODEL.total.itemCount)} 件`;
+}
+
+function renderKPIs(){
+  const ws = MODEL.warehouses;
+  const allItems = ws.flatMap(w=>w.items.map(i=>({...i,wh:w.name,code:w.code})));
+  const outC = allItems.filter(i=>i.alert==='断货').length;
+  const lowC = allItems.filter(i=>i.alert==='低库存').length;
+  const alertC = outC + lowC;
+  const dc = MODEL.total.dailyChange;
+  const dcSign = dc===null?'':(dc>0?`+${dc}`:`${dc}`);
+  const dcClass = dc===null?'zero':(dc<0?'neg':(dc>0?'pos':'zero'));
+
+  const cards = [
+    {lbl:'总SKU数', val:fmt(MODEL.total.skuCount), icon:'🏷️', bg:'var(--primary-soft)',fg:'var(--primary)',
+     foot:`<span>分布于 ${ws.length} 个仓库</span>`},
+    {lbl:'总库存件数', val:fmt(MODEL.total.itemCount), icon:'📦', bg:'var(--ok-soft)',fg:'#059669',
+     foot: dc===null?`<span>无环比数据</span>`:`<span>日环比</span><span class="delta ${dcClass}">${dcSign} 件</span>`},
+    {lbl:'仓库数量', val:ws.length, icon:'🏭', bg:'#eff6ff',fg:'#2563eb',
+     foot:`<span>${ws.map(w=>w.code).join(' / ')}</span>`},
+    {lbl:'预警SKU', val:fmt(alertC), icon:'⚠️', bg: alertC? 'var(--danger-soft)':'var(--ok-soft)',fg: alertC?'#dc2626':'#059669',
+     foot:`<span>断货 <b style="color:#dc2626">${outC}</b> · 低库存 <b style="color:#b45309">${lowC}</b></span>`}
+  ];
+  $('#kpis').innerHTML = cards.map(c=>`
+    <div class="kpi">
+      <div class="ic" style="background:${c.bg};color:${c.fg}">${c.icon}</div>
+      <div class="lbl">${c.lbl}</div>
+      <div class="val">${c.val}</div>
+      <div class="foot">${c.foot}</div>
+    </div>`).join('');
+}
+
+function renderWhChart(){
+  const ws = [...MODEL.warehouses].sort((a,b)=>b.itemCount-a.itemCount);
+  const max = Math.max(...ws.map(w=>w.itemCount),1);
+  const colors = ['#4f46e5','#7c3aed','#0ea5e9'];
+  $('#wh-chart').innerHTML = ws.map((w,i)=>{
+    const pct = (w.itemCount/max*100).toFixed(1);
+    const alertN = w.items.filter(x=>x.alert).length;
+    return `<div class="whbar">
+      <div class="top"><span class="nm">${esc(w.code)} ${esc(w.name)}</span>
+        <span class="vs">${fmt(w.itemCount)} 件</span></div>
+      <div class="track"><div class="fill" style="width:${pct}%;background:${colors[i%colors.length]}">${pct}%</div></div>
+      <div class="sub"><span>SKU <b>${w.items.length}</b></span><span>预警 <b style="color:${alertN?'#dc2626':'#6b7280'}">${alertN}</b></span>
+        <span>占比 <b>${(w.itemCount/MODEL.total.itemCount*100).toFixed(1)}%</b></span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderHealth(){
+  const all = MODEL.warehouses.flatMap(w=>w.items);
+  const total = all.length||1;
+  const ok = all.filter(i=>!i.alert).length;
+  const low = all.filter(i=>i.alert==='低库存').length;
+  const out = all.filter(i=>i.alert==='断货').length;
+  const okPct=ok/total, lowPct=low/total, outPct=out/total;
+  const R=54, C=2*Math.PI*R;
+  const seg=(p,color,off)=>{
+    const len=C*p;
+    return `<circle cx="65" cy="65" r="${R}" fill="none" stroke="${color}" stroke-width="16"
+      stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 65 65)"
+      style="transition:stroke-dasharray .8s ease"/>`;
+  };
+  $('#health').innerHTML = `
+    <div class="donut">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="${R}" fill="none" stroke="#f3f4f6" stroke-width="16"/>
+        ${seg(outPct,'#ef4444',0)}
+        ${seg(lowPct,'#f59e0b',outPct*C)}
+        ${seg(okPct,'#10b981',(outPct+lowPct)*C)}
+      </svg>
+      <div class="center"><div class="n">${fmt(total)}</div><div class="t">SKU 总数</div></div>
+    </div>
+    <div class="legend">
+      <div class="row"><div class="l"><span class="sq" style="background:#10b981"></span>正常</div><div><span class="num">${ok}</span> · ${(okPct*100).toFixed(0)}%</div></div>
+      <div class="row"><div class="l"><span class="sq" style="background:#f59e0b"></span>低库存</div><div><span class="num">${low}</span> · ${(lowPct*100).toFixed(0)}%</div></div>
+      <div class="row"><div class="l"><span class="sq" style="background:#ef4444"></span>断货</div><div><span class="num">${out}</span> · ${(outPct*100).toFixed(0)}%</div></div>
+    </div>`;
+}
+
+function renderAlerts(){
+  const outs=[], lows=[];
+  MODEL.warehouses.forEach(w=>w.items.forEach(i=>{
+    if(i.alert==='断货') outs.push({...i,wh:w.name,code:w.code});
+    else if(i.alert==='低库存') lows.push({...i,wh:w.name,code:w.code});
+  }));
+  const box=(items,cls,title)=>`<div class="alert-box ${cls}">
+    <div class="ht">${title}<span class="cnt">${items.length}</span></div>
+    ${items.length?`<div class="alert-list">${items.map(i=>`
+      <div class="alert-item"><span>${esc(i.name)}<span class="wn"> · ${esc(i.code)} ${esc(i.wh)}</span></span>
+        <span class="qn" style="color:${cls==='out'?'#dc2626':'#b45309'}">${i.qty}件</span></div>`).join('')}</div>`
+      :`<div class="empty-note">暂无</div>`}
+  </div>`;
+  $('#alerts').innerHTML = box(outs.sort((a,b)=>a.qty-b.qty),'out','🔴 断货 SKU')+box(lows.sort((a,b)=>a.qty-b.qty),'low','🟡 低库存 SKU');
+}
+
+function renderTables(){
+  const q = $('#search').value.trim().toLowerCase();
+  const colors = ['#4f46e5','#0ea5e9','#7c3aed'];
+  const maxQty = Math.max(...MODEL.warehouses.flatMap(w=>w.items.map(i=>i.qty)),1);
+  $('#wh-tables').innerHTML = MODEL.warehouses.map((w,wi)=>{
+    let items = w.items;
+    if(q) items = items.filter(i=>i.name.toLowerCase().includes(q));
+    if(activeFilter==='out') items = items.filter(i=>i.alert==='断货');
+    else if(activeFilter==='low') items = items.filter(i=>i.alert==='低库存');
+    else if(activeFilter==='ok') items = items.filter(i=>!i.alert);
+    const alertN = w.items.filter(x=>x.alert).length;
+    const rows = items.length? items.map(i=>{
+      const cls = i.alert==='断货'?'out':(i.alert==='低库存'?'low':'ok');
+      const lbl = i.alert==='断货'?'断货':(i.alert==='低库存'?'低库存':'正常');
+      const barColor = i.alert==='断货'?'#ef4444':(i.alert==='低库存'?'#f59e0b':'#10b981');
+      return `<tr>
+        <td><span class="bar-mini"><i style="width:${i.qty/maxQty*100}%;background:${barColor}"></i></span>${esc(i.name)}</td>
+        <td class="num">${fmt(i.qty)}</td>
+        <td><span class="badge ${cls}">${lbl}</span></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="3" class="nores">无匹配SKU</td></tr>`;
+    return `<div class="wh-card" style="margin-bottom:14px">
+      <div class="wh-head">
+        <div class="lt"><span class="code" style="background:${colors[wi%colors.length]}1a;color:${colors[wi%colors.length]}">${esc(w.code)}</span>
+          <span class="nm">${esc(w.name)}</span></div>
+        <div class="rt">SKU <b>${w.items.length}</b> · 库存 <b>${fmt(w.items.reduce((s,i)=>s+i.qty,0))}</b>件 · 预警 <b style="color:${alertN?'#dc2626':'inherit'}">${alertN}</b></div>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>SKU名称</th><th class="num">库存</th><th>状态</th></tr></thead>
+        <tbody>${rows}</tbody></table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMatrix(){
+  const map = new Map();
+  MODEL.warehouses.forEach(w=>w.items.forEach(i=>{
+    if(!map.has(i.name)) map.set(i.name,{name:i.name,total:0,whs:[],alerts:new Set()});
+    const e = map.get(i.name);
+    e.total += i.qty;
+    e.whs.push({code:w.code,name:w.name,qty:i.qty});
+    if(i.alert) e.alerts.add(i.alert);
+  }));
+  const rows = [...map.values()].sort((a,b)=>b.total-a.total);
+  const q = $('#search').value.trim().toLowerCase();
+  const filt = q? rows.filter(r=>r.name.toLowerCase().includes(q)) : rows;
+  const body = filt.length? filt.map(r=>{
+    const worst = r.alerts.has('断货')?'断货':(r.alerts.has('低库存')?'低库存':'正常');
+    const cls = worst==='断货'?'out':(worst==='低库存'?'low':'ok');
+    return `<tr>
+      <td>${esc(r.name)}</td>
+      <td class="num">${fmt(r.total)}</td>
+      <td class="num">${r.whs.length}</td>
+      <td>${r.whs.map(x=>`<span style="font-size:11.5px;background:#f3f4f6;padding:2px 7px;border-radius:5px;margin-right:4px">${esc(x.code)} ${fmt(x.qty)}</span>`).join('')}</td>
+      <td><span class="badge ${cls}">${worst}</span></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="5" class="nores">无匹配SKU</td></tr>`;
+  $('#matrix').querySelector('tbody').innerHTML = body;
+}
+
+function renderChips(){
+  const all = MODEL.warehouses.flatMap(w=>w.items);
+  const out = all.filter(i=>i.alert==='断货').length;
+  const low = all.filter(i=>i.alert==='低库存').length;
+  const ok = all.length-out-low;
+  const chips=[['全部',all.length,'all'],['断货',out,'out'],['低库存',low,'low'],['正常',ok,'ok']];
+  $('#chips').innerHTML = chips.map(c=>`<span class="chip ${activeFilter===c[2]?'active':''}" data-f="${c[2]}">${c[0]} (${c[1]})</span>`).join('');
+  $('#chips').querySelectorAll('.chip').forEach(el=>el.onclick=()=>{
+    activeFilter = el.dataset.f;
+    renderChips();renderTables();
+  });
+}
+
+function renderAll(){
+  renderHead();renderKPIs();renderWhChart();renderHealth();
+  renderAlerts();renderChips();renderTables();renderMatrix();
+}
+
+$('#search').addEventListener('input',()=>{renderTables();renderMatrix();});
+$('#btn-update').onclick = ()=>{
+  const txt = $('#raw-input').value.trim();
+  if(!txt){setStatus('请先粘贴日报文本','err');return;}
+  try{
+    const m = parseInput(txt);
+    if(!m.warehouses.length){setStatus('未识别到仓库数据，请检查格式','err');return;}
+    MODEL = m; activeFilter='all'; $('#search').value='';
+    renderAll();setStatus('✓ 已更新看板','ok');toast('看板已更新');
+  }catch(e){setStatus('解析失败：'+e.message,'err');}
+};
+$('#btn-load').onclick = ()=>{ $('#raw-input').value = SAMPLE_DATA; setStatus('已载入示例数据','ok'); };
+$('#btn-export').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(MODEL,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `库存日报_${MODEL.date||'export'}.json`;
+  a.click();URL.revokeObjectURL(a.href);toast('已导出JSON');
+};
+$('#dp-toggle').onclick = ()=> $('#data-panel').classList.toggle('open');
+function setStatus(msg,type){const e=$('#dp-status');e.textContent=msg;e.className='dp-status '+(type||'');}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
+
+renderAll();
+</script>
 </body>
 </html>
