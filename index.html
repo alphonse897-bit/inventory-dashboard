@@ -327,7 +327,7 @@ function parseInput(text){
   let cur = null;
   const whRe = /【\s*([^\s】]+)\s+([^】]+?)\s*】\s*(\d+)\s*个\s*SKU(?:[，,]\s*(\d+)\s*件)?/;
   const itOld = /^\s*\d+\s*[\.、]\s*(.+?)\s*[：:]\s*(\d+)\s*件(.*)$/;
-  const itNew = /^\s*\d+\s*[\.、]\s*(.+?)\s*\|\s*[A-Z]+-\d+\s*\|\s*(\d+)\s*$/;
+  const itNew = /^\s*\d+\s*[\.、]\s*(.+?)\s*\|\s*[A-Z]+-\d+\s*\|\s*(\d+)(?:\s*(\S+))?\s*$/;
 
   for(const line of lines){
     const wM = line.match(whRe);
@@ -348,7 +348,13 @@ function parseInput(text){
     }
     const iN = line.match(itNew);
     if(iN && cur){
-      cur.items.push({name:iN[1].trim(), qty:+iN[2], alert:null});
+      const qty = +iN[2];
+      const mark = iN[3]||'';
+      let alert = null;
+      if(mark.includes('断货')) alert = '断货';
+      else if(mark.includes('低库存')) alert = '低库存';
+      else if(qty===0) alert = '断货';
+      cur.items.push({name:iN[1].trim(), qty, alert});
     }
   }
 
@@ -394,6 +400,40 @@ let activeFilter = 'all';
 const fmt = n => n.toLocaleString('zh-CN');
 const $ = s => document.querySelector(s);
 const esc = s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const COLORS = ['紫','红','绿','蓝','金','银','黑','白','灰','粉','黄','橙','青','炫彩','银色'];
+const BRANDS_PREFIX = ['本田','雅马哈','铃木','川崎'];
+const NUM_SUFFIX = /^\d+$/;
+
+function getCategory(name){
+  let n = name.trim();
+  if(n.startsWith('CLICK')) return 'CLICK' + getCategory(n.slice(5));
+  for(const b of BRANDS_PREFIX){ if(n.startsWith(b)){ n = n.slice(b.length); break; } }
+  // 先尝试去掉颜色后缀
+  for(const c of COLORS){
+    if(n.endsWith(c)){
+      const core = n.slice(0, n.length - c.length);
+      // 去掉尾部数字
+      const mNum = core.match(/^(.*?)\d+$/);
+      return mNum ? mNum[1] : core;
+    }
+  }
+  // 无颜色后缀时，去掉尾部数字部分
+  const mNum = n.match(/^(.*?)(\d+)$/);
+  if(mNum) return mNum[1];
+  return n;
+}
+
+function sortItems(items){
+  const statusRank = a => a.alert==='断货'?0:(a.alert==='低库存'?1:2);
+  return [...items].sort((a,b)=>{
+    const s = statusRank(a) - statusRank(b);
+    if(s!==0) return s;
+    const ca = getCategory(a.name), cb = getCategory(b.name);
+    if(ca!==cb) return ca.localeCompare(cb, 'zh');
+    return a.qty - b.qty;
+  });
+}
 
 function renderHead(){
   $('#hd-date').textContent = MODEL.date ? `${MODEL.date} 日报` : '—';
@@ -501,7 +541,7 @@ function renderTables(){
   const colors = ['#4f46e5','#0ea5e9','#7c3aed'];
   const maxQty = Math.max(...MODEL.warehouses.flatMap(w=>w.items.map(i=>i.qty)),1);
   $('#wh-tables').innerHTML = MODEL.warehouses.map((w,wi)=>{
-    let items = w.items;
+    let items = sortItems(w.items);
     if(q) items = items.filter(i=>i.name.toLowerCase().includes(q));
     if(activeFilter==='out') items = items.filter(i=>i.alert==='断货');
     else if(activeFilter==='low') items = items.filter(i=>i.alert==='低库存');
