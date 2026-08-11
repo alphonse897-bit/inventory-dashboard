@@ -148,6 +148,24 @@
   .toast.show{transform:translateX(-50%) translateY(0)}
   .sec{margin-bottom:16px}
   .nores{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+
+  .cat-summary{padding:11px 18px;border-top:1px solid var(--line);background:#fafbff;
+    font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .cat-summary .ctit{font-weight:700;color:var(--ink);display:inline-flex;align-items:center;gap:5px}
+  .cat-summary .ci{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:#fff;
+    border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--ink)}
+  .cat-summary .ci b{font-weight:700;color:var(--primary)}
+  .cat-summary .ci em{font-style:normal;color:var(--muted);font-weight:500}
+  .cat-summary .ci.out b{color:#dc2626}
+  .cat-summary .ci.low b{color:#b45309}
+  .cat-empty{color:var(--muted);font-size:12px;padding:2px 4px}
+
+  .cat-matrix-row{cursor:pointer}
+  .cat-matrix-row:hover{background:#f9fafb}
+  .cat-sub{font-size:11px;color:var(--muted);font-weight:500}
+  .cat-wh-cell{text-align:right;font-variant-numeric:tabular-nums}
+  .cat-wh-cell .lo{color:#b45309;font-weight:600}
+  .cat-wh-cell .ot{color:#dc2626;font-weight:700}
   @media(max-width:520px){
     body{padding:18px 12px 40px}
     .kpi .val{font-size:26px}
@@ -201,6 +219,24 @@
       <div id="chips"></div>
     </div>
     <div id="wh-tables"></div>
+  </div>
+
+  <div class="card sec" id="cat-section">
+    <h2>全仓类目统计 <span class="n">按品类聚合 · 共<span id="cat-total">0</span>个类目</span></h2>
+    <div class="matrix-wrap">
+      <table id="cat-matrix">
+        <thead><tr>
+          <th>类目</th>
+          <th class="num">总库存</th>
+          <th class="num">SKU数</th>
+          <th class="num" id="cat-th-0">仓1</th>
+          <th class="num" id="cat-th-1">仓2</th>
+          <th class="num" id="cat-th-2">仓3</th>
+          <th>状态</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="card sec">
@@ -567,6 +603,7 @@ function renderTables(){
         <table><thead><tr><th>SKU名称</th><th class="num">库存</th><th>状态</th></tr></thead>
         <tbody>${rows}</tbody></table>
       </div>
+      ${renderWhCategorySummary(items)}
     </div>`;
   }).join('');
 }
@@ -606,16 +643,145 @@ function renderChips(){
   $('#chips').innerHTML = chips.map(c=>`<span class="chip ${activeFilter===c[2]?'active':''}" data-f="${c[2]}">${c[0]} (${c[1]})</span>`).join('');
   $('#chips').querySelectorAll('.chip').forEach(el=>el.onclick=()=>{
     activeFilter = el.dataset.f;
-    renderChips();renderTables();
+    renderChips();renderTables();renderCatMatrix();
   });
+}
+
+/* ============ 类目汇总 ============ */
+function buildCategoryMap(items){
+  const m = new Map();
+  items.forEach(i=>{
+    const cat = getCategory(i.name);
+    if(!m.has(cat)) m.set(cat,{name:cat,total:0,count:0,alerts:new Set()});
+    const e = m.get(cat);
+    e.total += i.qty;
+    e.count += 1;
+    if(i.alert) e.alerts.add(i.alert);
+  });
+  return m;
+}
+
+function categoryWorst(alerts){
+  if(alerts.has('断货')) return {label:'断货',cls:'out'};
+  if(alerts.has('低库存')) return {label:'低库存',cls:'low'};
+  return {label:'正常',cls:'ok'};
+}
+
+function renderWhCategorySummary(items){
+  const map = buildCategoryMap(items);
+  const arr = [...map.values()].sort((a,b)=>b.total-a.total);
+  if(!arr.length) return `<div class="cat-summary"><span class="cat-empty">暂无匹配类目</span></div>`;
+  const pills = arr.map(c=>{
+    const w = categoryWorst(c.alerts);
+    const totalText = c.total===0 ? '断货' : `${fmt(c.total)}件`;
+    return `<span class="ci ${w.cls==='out'?'out':(w.cls==='low'?'low':'')}">
+      <b>${esc(c.name)}</b> ${totalText}<em>(${c.count}个)</em>
+    </span>`;
+  }).join('');
+  return `<div class="cat-summary"><span class="ctit">📊 类目汇总</span>${pills}</div>`;
+}
+
+function renderCatMatrix(){
+  const ws = MODEL.warehouses;
+  const q = $('#search').value.trim().toLowerCase();
+
+  // Build per-warehouse category maps
+  const whMaps = ws.map(w=>buildCategoryMap(w.items));
+
+  // Collect all categories
+  const allCats = new Set();
+  whMaps.forEach(m=>{ for(const k of m.keys()) allCats.add(k); });
+
+  // Filter by search: include category if any SKU in it matches the query
+  let catNames = [...allCats];
+  if(q){
+    catNames = catNames.filter(cat=>{
+      // Check if any SKU in this category (across any warehouse) matches the search
+      for(let wi=0; wi<ws.length; wi++){
+        const catData = whMaps[wi].get(cat);
+        if(!catData) continue;
+        // Need to check actual item names - let's find items in this category
+        const matching = ws[wi].items.filter(it=>getCategory(it.name)===cat && it.name.toLowerCase().includes(q));
+        if(matching.length) return true;
+      }
+      return false;
+    });
+  }
+
+  // Also apply status filter
+  if(activeFilter!=='all'){
+    catNames = catNames.filter(cat=>{
+      let hasMatch = false;
+      for(let wi=0; wi<ws.length; wi++){
+        const cd = whMaps[wi].get(cat);
+        if(!cd) continue;
+        if(activeFilter==='out' && cd.alerts.has('断货')) return true;
+        if(activeFilter==='low' && cd.alerts.has('低库存')) return true;
+        if(activeFilter==='ok' && cd.alerts.size===0) { hasMatch = true; }
+      }
+      return activeFilter==='ok' ? hasMatch : false;
+    });
+  }
+
+  // Build full category objects with per-warehouse data
+  const rows = catNames.map(cat=>{
+    const r = {name:cat,total:0,count:0,alerts:new Set(),whData:[]};
+    ws.forEach((w,wi)=>{
+      const cd = whMaps[wi].get(cat);
+      if(cd){
+        r.total += cd.total;
+        r.count += cd.count;
+        cd.alerts.forEach(a=>r.alerts.add(a));
+        r.whData.push({total:cd.total,count:cd.count,alerts:cd.alerts});
+      } else {
+        r.whData.push(null);
+      }
+    });
+    return r;
+  }).sort((a,b)=>b.total-a.total);
+
+  // Set header texts
+  ws.forEach((w,i)=>{
+    const el = document.getElementById(`cat-th-${i}`);
+    if(el) el.textContent = w.code;
+  });
+  $('#cat-total').textContent = rows.length;
+
+  const tbody = rows.length? rows.map(r=>{
+    const w = categoryWorst(r.alerts);
+    const whCells = r.whData.map((d,wi)=>{
+      if(!d) return `<td class="cat-wh-cell" style="color:var(--muted)">—</td>`;
+      const dw = categoryWorst(d.alerts);
+      const spanCls = dw.cls==='out'?'ot':(dw.cls==='low'?'lo':'');
+      let extra = '';
+      if(d.alerts.has('低库存')) {
+        // count low-stock skus in this wh cat
+        const lowN = ws[wi].items.filter(it=>getCategory(it.name)===r.name && it.alert==='低库存').length;
+        extra = `<span class="lo">(${lowN}件低)</span>`;
+      } else if(d.alerts.has('断货')){
+        const outN = ws[wi].items.filter(it=>getCategory(it.name)===r.name && it.alert==='断货').length;
+        extra = `<span class="ot">(${outN}件断)</span>`;
+      }
+      return `<td class="cat-wh-cell"><span class="${spanCls}">${fmt(d.total)}</span>${extra}<div class="cat-sub">${d.count}个SKU</div></td>`;
+    }).join('');
+    return `<tr class="cat-matrix-row">
+      <td><b>${esc(r.name)}</b></td>
+      <td class="num"><b>${fmt(r.total)}</b></td>
+      <td class="num">${r.count}</td>
+      ${whCells}
+      <td><span class="badge ${w.cls}">${w.label}</span></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="${3+ws.length+1}" class="nores">无匹配类目</td></tr>`;
+
+  $('#cat-matrix').querySelector('tbody').innerHTML = tbody;
 }
 
 function renderAll(){
   renderHead();renderKPIs();renderWhChart();renderHealth();
-  renderAlerts();renderChips();renderTables();renderMatrix();
+  renderAlerts();renderChips();renderTables();renderMatrix();renderCatMatrix();
 }
 
-$('#search').addEventListener('input',()=>{renderTables();renderMatrix();});
+$('#search').addEventListener('input',()=>{renderTables();renderMatrix();renderCatMatrix();});
 $('#btn-update').onclick = ()=>{
   const txt = $('#raw-input').value.trim();
   if(!txt){setStatus('请先粘贴日报文本','err');return;}
