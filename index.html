@@ -271,65 +271,541 @@
 
 <script>
 /* ============ 原始数据 ============ */
-const SAMPLE_DATA = `脚踏01银色|PH-08|63480-Rear Footrest01-Sliver|49|0|0|49
-脚踏01银色|TH-08|63480-Rear Footrest01-Sliver|49|0|0|49
-CLICK风叶盖银|PH-08|63480-CLICK-FAN-SLIVER|86|0|0|86
-CLICK风叶盖紫|PH-08|63480-CLICK-FAN-PURPLE|87|0|0|87
-本田摇臂|MY-02|63480-honda-Swingarm|25|0|0|25
-本田摇臂|PH-08|63480-honda-Swingarm|28|0|0|28
-雅马哈摇臂|MY-02|63480-yamaha-Swingarm|25|0|0|25
-雅马哈摇臂|PH-08|63480-yamaha-Swingarm|7|0|0|7
-风叶盖绿|MY-02|63480-VESPA-FAN--Green |0|0|0|0
-风叶盖绿|PH-08|63480-VESPA-FAN--Green |60|0|0|60
-风叶盖绿|TH-08|63480-VESPA-FAN--Green |54|0|0|54
-风叶盖银|MY-02|63480-VESPA-FAN-SILVER|76|0|0|76
-风叶盖银|PH-08|63480-VESPA-FAN-SILVER|147|0|0|147
-风叶盖银|TH-08|63480-VESPA-FAN-SILVER|39|0|0|39
-风叶盖紫|MY-02|63480-VESPA-FAN-PURPLE|84|0|0|84
-风叶盖紫|PH-08|63480-VESPA-FAN-PURPLE|161|0|0|161
-风叶盖紫|TH-08|63480-VESPA-FAN-PURPLE|79|0|0|79
-风叶盖蓝|MY-02|63480-VESPA-FAN-BLUE|15|0|0|15
-风叶盖蓝|PH-08|63480-VESPA-FAN-BLUE|77|0|0|77
-风叶盖蓝|TH-08|63480-VESPA-FAN-BLUE|40|0|0|40
-风叶盖金|MY-02|63480-VESPA-FAN-GOLD|30|0|0|30
-风叶盖金|PH-08|63480-VESPA-FAN-GOLD|45|0|0|45
-风叶盖金|TH-08|63480-VESPA-FAN-GOLD|61|0|0|61
-风叶盖黑|MY-02|63480-VESPA-FAN-BLACK|82|0|0|82
-风叶盖黑|PH-08|63480-VESPA-FAN-BLACK|46|0|0|46
-风叶盖黑|TH-08|63480-VESPA-FAN-BLACK|31|0|0|31
-风叶盖红|MY-02|63480-VESPA-FAN-RED|43|0|0|43
-风叶盖红|PH-08|63480-VESPA-FAN-RED|72|0|0|72
-风叶盖红|TH-08|63480-VESPA-FAN-RED|68|0|0|68
-风叶盖炫彩|MY-02|63480-VESPA-FAN-Color|47|0|0|47
-风叶盖炫彩|PH-08|63480-VESPA-FAN-Color|26|0|0|26
-风叶盖炫彩|TH-08|63480-VESPA-FAN-Color|32|0|0|32
-上泵盖红|PH-08|63480-Brake Cap-Red|33|0|0|33
-上泵盖红|TH-08|63480-Brake Cap-Red|35|0|0|35
-上泵盖紫|PH-08|63480-Brake Cap-Purple|2|0|2|0
-上泵盖紫|TH-08|63480-Brake Cap-Purple|33|0|0|33
-上泵盖绿|TH-08|63480-Brake Cap-Green|49|0|0|49
-上泵盖蓝|PH-08|63480-Brake Cap-Blue|40|0|0|40
-上泵盖蓝|TH-08|63480-Brake Cap-Blue|29|0|0|29
-上泵盖金|PH-08|63480-Brake Cap-Gold|0|0|0|0
-上泵盖金|TH-08|63480-Brake Cap-Gold|33|0|0|33
-上泵盖黑|PH-08|63480-Brake Cap-Black|73|0|0|73
-上泵盖黑|TH-08|63480-Brake Cap-Black|49|0|0|49
-上泵盖银|PH-08|63480-Brake Cap-Silver|4|0|11|-7
-上泵盖银|TH-08|63480-Brake Cap-Silver|46|0|0|46
-铆钉银|PH-08|63480-Rivets-Silver|57|0|3|54
-铆钉银|TH-08|63480-Rivets-Silver|36|0|0|36
-铆钉绿|PH-08|63480-Rivets-Green|19|0|0|19
-铆钉绿|TH-08|63480-Rivets-Green|22|0|0|22
-铆钉紫|PH-08|63480-Rivets-Purple|74|0|4|70
-铆钉紫|TH-08|63480-Rivets-Purple|41|0|0|41
-铆钉黑|PH-08|63480-Rivets-Black|0|0|0|0
-铆钉黑|TH-08|63480-Rivets-Black|16|0|0|16
-铆钉金|PH-08|63480-Rivets-Gold|27|0|0|27
-铆钉金|TH-08|63480-Rivets-Gold|16|0|0|16
-铆钉红|PH-08|63480-Rivets-Red|21|0|0|21
-铆钉红|TH-08|63480-Rivets-Red|15|0|0|15
-铆钉蓝|PH-08|63480-Rivets-Blue|30|0|0|30
-铆钉蓝|TH-08|63480-Rivets-Blue|13|0|0|13`;
+const SAMPLE_DATA = `
+[
+  {
+    "sku": "63480-honda-Swingarm",
+    "name": "本田摇臂",
+    "warehouse": "MY-02",
+    "available": 25,
+    "total": 25,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-yamaha-Swingarm",
+    "name": "雅马哈摇臂",
+    "warehouse": "MY-02",
+    "available": 25,
+    "total": 25,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-Color",
+    "name": "风叶盖炫彩",
+    "warehouse": "MY-02",
+    "available": 47,
+    "total": 47,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-PURPLE",
+    "name": "风叶盖紫",
+    "warehouse": "MY-02",
+    "available": 84,
+    "total": 84,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-RED",
+    "name": "风叶盖红",
+    "warehouse": "MY-02",
+    "available": 43,
+    "total": 43,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN--Green ",
+    "name": "风叶盖绿",
+    "warehouse": "MY-02",
+    "available": 0,
+    "total": 0,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-BLUE",
+    "name": "风叶盖蓝",
+    "warehouse": "MY-02",
+    "available": 15,
+    "total": 15,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-GOLD",
+    "name": "风叶盖金",
+    "warehouse": "MY-02",
+    "available": 30,
+    "total": 30,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-SILVER",
+    "name": "风叶盖银",
+    "warehouse": "MY-02",
+    "available": 76,
+    "total": 76,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-BLACK",
+    "name": "风叶盖黑",
+    "warehouse": "MY-02",
+    "available": 82,
+    "total": 82,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-CLICK-FAN-PURPLE",
+    "name": "CLICK风叶盖紫",
+    "warehouse": "PH-08",
+    "available": 87,
+    "total": 87,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-CLICK-FAN-SLIVER",
+    "name": "CLICK风叶盖银",
+    "warehouse": "PH-08",
+    "available": 86,
+    "total": 86,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Purple",
+    "name": "上泵盖紫",
+    "warehouse": "PH-08",
+    "available": 0,
+    "total": 2,
+    "occupied": 0,
+    "disabled": 2
+  },
+  {
+    "sku": "63480-Brake Cap-Red",
+    "name": "上泵盖红",
+    "warehouse": "PH-08",
+    "available": 33,
+    "total": 33,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Blue",
+    "name": "上泵盖蓝",
+    "warehouse": "PH-08",
+    "available": 40,
+    "total": 40,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Gold",
+    "name": "上泵盖金",
+    "warehouse": "PH-08",
+    "available": 0,
+    "total": 0,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Silver",
+    "name": "上泵盖银",
+    "warehouse": "PH-08",
+    "available": -7,
+    "total": 4,
+    "occupied": 0,
+    "disabled": 11
+  },
+  {
+    "sku": "63480-Brake Cap-Black",
+    "name": "上泵盖黑",
+    "warehouse": "PH-08",
+    "available": 72,
+    "total": 72,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-honda-Swingarm",
+    "name": "本田摇臂",
+    "warehouse": "PH-08",
+    "available": 27,
+    "total": 27,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rear Footrest01-Sliver",
+    "name": "脚踏01银色",
+    "warehouse": "PH-08",
+    "available": 49,
+    "total": 49,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Purple",
+    "name": "铆钉紫",
+    "warehouse": "PH-08",
+    "available": 70,
+    "total": 74,
+    "occupied": 0,
+    "disabled": 4
+  },
+  {
+    "sku": "63480-Rivets-Red",
+    "name": "铆钉红",
+    "warehouse": "PH-08",
+    "available": 21,
+    "total": 21,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Green",
+    "name": "铆钉绿",
+    "warehouse": "PH-08",
+    "available": 18,
+    "total": 18,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Blue",
+    "name": "铆钉蓝",
+    "warehouse": "PH-08",
+    "available": 30,
+    "total": 30,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Gold",
+    "name": "铆钉金",
+    "warehouse": "PH-08",
+    "available": 27,
+    "total": 27,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Silver",
+    "name": "铆钉银",
+    "warehouse": "PH-08",
+    "available": 52,
+    "total": 55,
+    "occupied": 0,
+    "disabled": 3
+  },
+  {
+    "sku": "63480-Rivets-Black",
+    "name": "铆钉黑",
+    "warehouse": "PH-08",
+    "available": 0,
+    "total": 0,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-yamaha-Swingarm",
+    "name": "雅马哈摇臂",
+    "warehouse": "PH-08",
+    "available": 7,
+    "total": 7,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-Color",
+    "name": "风叶盖炫彩",
+    "warehouse": "PH-08",
+    "available": 25,
+    "total": 25,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-PURPLE",
+    "name": "风叶盖紫",
+    "warehouse": "PH-08",
+    "available": 153,
+    "total": 153,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-RED",
+    "name": "风叶盖红",
+    "warehouse": "PH-08",
+    "available": 72,
+    "total": 72,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN--Green ",
+    "name": "风叶盖绿",
+    "warehouse": "PH-08",
+    "available": 60,
+    "total": 60,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-BLUE",
+    "name": "风叶盖蓝",
+    "warehouse": "PH-08",
+    "available": 76,
+    "total": 77,
+    "occupied": 1,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-GOLD",
+    "name": "风叶盖金",
+    "warehouse": "PH-08",
+    "available": 45,
+    "total": 45,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-SILVER",
+    "name": "风叶盖银",
+    "warehouse": "PH-08",
+    "available": 146,
+    "total": 146,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-BLACK",
+    "name": "风叶盖黑",
+    "warehouse": "PH-08",
+    "available": 46,
+    "total": 46,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Purple",
+    "name": "上泵盖紫",
+    "warehouse": "TH-08",
+    "available": 33,
+    "total": 33,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Red",
+    "name": "上泵盖红",
+    "warehouse": "TH-08",
+    "available": 35,
+    "total": 35,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Green",
+    "name": "上泵盖绿",
+    "warehouse": "TH-08",
+    "available": 49,
+    "total": 49,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Blue",
+    "name": "上泵盖蓝",
+    "warehouse": "TH-08",
+    "available": 29,
+    "total": 29,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Gold",
+    "name": "上泵盖金",
+    "warehouse": "TH-08",
+    "available": 33,
+    "total": 33,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Silver",
+    "name": "上泵盖银",
+    "warehouse": "TH-08",
+    "available": 46,
+    "total": 46,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Brake Cap-Black",
+    "name": "上泵盖黑",
+    "warehouse": "TH-08",
+    "available": 49,
+    "total": 49,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rear Footrest01-Sliver",
+    "name": "脚踏01银色",
+    "warehouse": "TH-08",
+    "available": 49,
+    "total": 49,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Purple",
+    "name": "铆钉紫",
+    "warehouse": "TH-08",
+    "available": 41,
+    "total": 41,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Red",
+    "name": "铆钉红",
+    "warehouse": "TH-08",
+    "available": 15,
+    "total": 15,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Green",
+    "name": "铆钉绿",
+    "warehouse": "TH-08",
+    "available": 22,
+    "total": 22,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Blue",
+    "name": "铆钉蓝",
+    "warehouse": "TH-08",
+    "available": 13,
+    "total": 13,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Gold",
+    "name": "铆钉金",
+    "warehouse": "TH-08",
+    "available": 16,
+    "total": 16,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Silver",
+    "name": "铆钉银",
+    "warehouse": "TH-08",
+    "available": 36,
+    "total": 36,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-Rivets-Black",
+    "name": "铆钉黑",
+    "warehouse": "TH-08",
+    "available": 16,
+    "total": 16,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-Color",
+    "name": "风叶盖炫彩",
+    "warehouse": "TH-08",
+    "available": 32,
+    "total": 32,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-PURPLE",
+    "name": "风叶盖紫",
+    "warehouse": "TH-08",
+    "available": 79,
+    "total": 79,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-RED",
+    "name": "风叶盖红",
+    "warehouse": "TH-08",
+    "available": 68,
+    "total": 68,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN--Green ",
+    "name": "风叶盖绿",
+    "warehouse": "TH-08",
+    "available": 54,
+    "total": 54,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-BLUE",
+    "name": "风叶盖蓝",
+    "warehouse": "TH-08",
+    "available": 40,
+    "total": 40,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-GOLD",
+    "name": "风叶盖金",
+    "warehouse": "TH-08",
+    "available": 61,
+    "total": 61,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-SILVER",
+    "name": "风叶盖银",
+    "warehouse": "TH-08",
+    "available": 38,
+    "total": 38,
+    "occupied": 0,
+    "disabled": 0
+  },
+  {
+    "sku": "63480-VESPA-FAN-BLACK",
+    "name": "风叶盖黑",
+    "warehouse": "TH-08",
+    "available": 29,
+    "total": 29,
+    "occupied": 0,
+    "disabled": 0
+  }
+]
+`;
 
 /* ============ 解析器 ============ */
 function parseInput(text){
