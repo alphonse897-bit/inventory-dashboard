@@ -938,6 +938,41 @@ const SAMPLE_DATA = `{
 function parseInput(text){
   const m = {date:'', warehouses:[], total:{skuCount:0,itemCount:0,dailyChange:null}};
 
+  /* ---- JSON格式兼容 ---- */
+  try{
+    const j = JSON.parse(text);
+    if(j && j.items && Array.isArray(j.items)){
+      const WH_NAMES = {'MY-02':'马来仓','PH-08':'菲律宾仓','TH-08':'泰国仓'};
+      const whMap = {};
+      j.items.forEach(it=>{
+        const wh = it.warehouse || '';
+        if(!whMap[wh]) whMap[wh] = {code:wh, name:WH_NAMES[wh]||wh, skuCount:0, itemCount:0, items:[]};
+        const w = whMap[wh];
+        const qty = it.available != null ? it.available : 0;
+        let alert = null;
+        if(qty <= 0) alert = '断货';
+        else if(qty <= 20) alert = '低库存';
+        w.items.push({name:it.cnName||it.sku||'', qty, alert});
+        w.skuCount++;
+        w.itemCount += qty;
+      });
+      const whOrder = ['MY-02','PH-08','TH-08'];
+      m.warehouses = whOrder.filter(c=>whMap[c]).map(c=>whMap[c]);
+      Object.keys(whMap).filter(c=>!whOrder.includes(c)).forEach(c=>m.warehouses.push(whMap[c]));
+      if(j.summary){
+        m.total.skuCount = j.summary.totalSKU || 0;
+        m.total.itemCount = j.summary.totalAvailable || 0;
+        m.total.dailyChange = j.summary.dayChange != null ? j.summary.dayChange : null;
+      }
+      if(j.date){
+        const ds = String(j.date);
+        if(ds.length===8) m.date = ds.slice(0,4)+'/'+ds.slice(4,6)+'/'+ds.slice(6,8);
+        else m.date = ds;
+      }
+      return m;
+    }
+  }catch(e){}
+
   const dM = text.match(/(\d{1,2})月(\d{1,2})日/);
   if(dM) m.date = `${dM[1]}月${dM[2]}日`;
 
