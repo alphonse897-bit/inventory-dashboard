@@ -232,6 +232,7 @@
           <th class="num" id="cat-th-0">仓1</th>
           <th class="num" id="cat-th-1">仓2</th>
           <th class="num" id="cat-th-2">仓3</th>
+          <th class="num">货值</th>
           <th>状态</th>
         </tr></thead>
         <tbody></tbody>
@@ -969,6 +970,17 @@ function parseInput(text){
         if(ds.length===8) m.date = ds.slice(0,4)+'/'+ds.slice(4,6)+'/'+ds.slice(6,8);
         else m.date = ds;
       }
+      /* 成本货值计算 */
+      m.total.costValue = 0;
+      m.warehouses.forEach(w=>{
+        w.costValue = 0;
+        w.items.forEach(i=>{
+          i.unitPrice = getUnitPrice(i.name);
+          i.costValue = i.qty * i.unitPrice;
+          w.costValue += i.costValue;
+        });
+        m.total.costValue += w.costValue;
+      });
       return m;
     }
   }catch(e){}
@@ -1036,6 +1048,18 @@ function parseInput(text){
     m.total.itemCount = m.warehouses.reduce((s,w)=>s+w.itemCount,0);
   }
 
+  /* ---- 成本货值计算 ---- */
+  m.total.costValue = 0;
+  m.warehouses.forEach(w=>{
+    w.costValue = 0;
+    w.items.forEach(i=>{
+      i.unitPrice = getUnitPrice(i.name);
+      i.costValue = i.qty * i.unitPrice;
+      w.costValue += i.costValue;
+    });
+    m.total.costValue += w.costValue;
+  });
+
   return m;
 }
 
@@ -1085,6 +1109,20 @@ function getCategory(name){
   return n;
 }
 
+function getUnitPrice(name){
+  const n = name.trim();
+  if(n.startsWith('CLICK')) return 72;
+  if(n.startsWith('风叶盖')){
+    if(n.includes('炫彩')) return 33;
+    return 29;
+  }
+  if(n.startsWith('上泵盖')) return 9;
+  if(n.startsWith('铆钉')) return 6.5;
+  if(n.endsWith('摇臂')) return 9.5;
+  if(n.startsWith('脚踏')) return 8.5;
+  return 0;
+}
+
 function sortItems(items){
   const statusRank = a => a.alert==='断货'?0:(a.alert==='低库存'?1:2);
   return [...items].sort((a,b)=>{
@@ -1122,7 +1160,9 @@ function renderKPIs(){
     {lbl:'仓库数量', val:ws.length, icon:'🏭', bg:'#eff6ff',fg:'#2563eb',
      foot:`<span>${ws.map(w=>w.code).join(' / ')}</span>`},
     {lbl:'预警SKU', val:fmt(alertC), icon:'⚠️', bg: alertC? 'var(--danger-soft)':'var(--ok-soft)',fg: alertC?'#dc2626':'#059669',
-     foot:`<span>断货 <b style="color:#dc2626">${outC}</b> · 低库存 <b style="color:#b45309">${lowC}</b></span>`}
+     foot:`<span>断货 <b style="color:#dc2626">${outC}</b> · 低库存 <b style="color:#b45309">${lowC}</b></span>`},
+    {lbl:'总成本货值', val:'¥'+fmt(Math.round(MODEL.total.costValue||0)), icon:'💰', bg:'#fef3c7',fg:'#d97706',
+     foot:`<span>按品类单价估算</span>`}
   ];
   $('#kpis').innerHTML = cards.map(c=>`
     <div class="kpi">
@@ -1145,7 +1185,8 @@ function renderWhChart(){
         <span class="vs">${fmt(w.itemCount)} 件</span></div>
       <div class="track"><div class="fill" style="width:${pct}%;background:${colors[i%colors.length]}">${pct}%</div></div>
       <div class="sub"><span>SKU <b>${w.items.length}</b></span><span>预警 <b style="color:${alertN?'#dc2626':'#6b7280'}">${alertN}</b></span>
-        <span>占比 <b>${(w.itemCount/MODEL.total.itemCount*100).toFixed(1)}%</b></span></div>
+        <span>占比 <b>${(w.itemCount/MODEL.total.itemCount*100).toFixed(1)}%</b></span>
+        <span>货值 <b style="color:#d97706">¥${fmt(Math.round(w.costValue||0))}</b></span></div>
     </div>`;
   }).join('');
 }
@@ -1222,7 +1263,7 @@ function renderTables(){
       <div class="wh-head">
         <div class="lt"><span class="code" style="background:${colors[wi%colors.length]}1a;color:${colors[wi%colors.length]}">${esc(w.code)}</span>
           <span class="nm">${esc(w.name)}</span></div>
-        <div class="rt">SKU <b>${w.items.length}</b> · 库存 <b>${fmt(w.items.reduce((s,i)=>s+i.qty,0))}</b>件 · 预警 <b style="color:${alertN?'#dc2626':'inherit'}">${alertN}</b></div>
+        <div class="rt">SKU <b>${w.items.length}</b> · 库存 <b>${fmt(w.items.reduce((s,i)=>s+i.qty,0))}</b>件 · 货值 <b style="color:#d97706">¥${fmt(Math.round(w.costValue||0))}</b> · 预警 <b style="color:${alertN?'#dc2626':'inherit'}">${alertN}</b></div>
       </div>
       <div class="tbl-wrap">
         <table><thead><tr><th>SKU名称</th><th class="num">库存</th><th>状态</th></tr></thead>
@@ -1277,10 +1318,11 @@ function buildCategoryMap(items){
   const m = new Map();
   items.forEach(i=>{
     const cat = getCategory(i.name);
-    if(!m.has(cat)) m.set(cat,{name:cat,total:0,count:0,alerts:new Set()});
+    if(!m.has(cat)) m.set(cat,{name:cat,total:0,count:0,costValue:0,alerts:new Set()});
     const e = m.get(cat);
     e.total += i.qty;
     e.count += 1;
+    e.costValue += (i.costValue || i.qty * (i.unitPrice || getUnitPrice(i.name)));
     if(i.alert) e.alerts.add(i.alert);
   });
   return m;
@@ -1299,8 +1341,9 @@ function renderWhCategorySummary(items){
   const pills = arr.map(c=>{
     const w = categoryWorst(c.alerts);
     const totalText = c.total===0 ? '断货' : `${fmt(c.total)}件`;
+    const costText = c.costValue ? `¥${fmt(Math.round(c.costValue))}` : '';
     return `<span class="ci ${w.cls==='out'?'out':(w.cls==='low'?'low':'')}">
-      <b>${esc(c.name)}</b> ${totalText}<em>(${c.count}个)</em>
+      <b>${esc(c.name)}</b> ${totalText}<em>(${c.count}个)</em>${costText?`<em style="color:#d97706;margin-left:4px">${costText}</em>`:''}
     </span>`;
   }).join('');
   return `<div class="cat-summary"><span class="ctit">📊 类目汇总</span>${pills}</div>`;
@@ -1357,7 +1400,7 @@ function renderCatMatrix(){
         r.total += cd.total;
         r.count += cd.count;
         cd.alerts.forEach(a=>r.alerts.add(a));
-        r.whData.push({total:cd.total,count:cd.count,alerts:cd.alerts});
+        r.whData.push({total:cd.total,count:cd.count,costValue:cd.costValue||0,alerts:cd.alerts});
       } else {
         r.whData.push(null);
       }
@@ -1389,14 +1432,16 @@ function renderCatMatrix(){
       }
       return `<td class="cat-wh-cell"><span class="${spanCls}">${fmt(d.total)}</span>${extra}<div class="cat-sub">${d.count}个SKU</div></td>`;
     }).join('');
+    const totalCost = r.whData.reduce((s,d)=>s+(d?d.costValue||0:0),0);
     return `<tr class="cat-matrix-row">
       <td><b>${esc(r.name)}</b></td>
       <td class="num"><b>${fmt(r.total)}</b></td>
       <td class="num">${r.count}</td>
       ${whCells}
+      <td class="num" style="color:#d97706;font-weight:700">¥${fmt(Math.round(totalCost))}</td>
       <td><span class="badge ${w.cls}">${w.label}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="${3+ws.length+1}" class="nores">无匹配类目</td></tr>`;
+  }).join('') : `<tr><td colspan="${3+ws.length+2}" class="nores">无匹配类目</td></tr>`;
 
   $('#cat-matrix').querySelector('tbody').innerHTML = tbody;
 }
