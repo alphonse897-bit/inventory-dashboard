@@ -273,14 +273,14 @@
 <script>
 /* ============ 原始数据 ============ */
 const SAMPLE_DATA = `{
-  "date": "20261016",
-  "fetchTime": "2026-10-16 19:10:01",
+  "date": "20261017",
+  "fetchTime": "2026-10-17 19:11:35",
   "summary": {
     "totalSKU": 64,
-    "totalAvailable": 2513,
+    "totalAvailable": 2483,
     "outOfStock": 3,
     "lowStock": 14,
-    "dayChange": -51
+    "dayChange": -30
   },
   "items": [
     {
@@ -344,10 +344,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5755461722752161364",
       "warehouse": "MY-02",
       "stockId": "69",
-      "inventoryQuantity": 34,
-      "occupationQuantity": 1,
+      "inventoryQuantity": 32,
+      "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 33
+      "available": 32
     },
     {
       "sku": "63480-VESPA-FAN-RED",
@@ -388,10 +388,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5755461239706753099",
       "warehouse": "MY-02",
       "stockId": "69",
-      "inventoryQuantity": 10,
+      "inventoryQuantity": 11,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 10
+      "available": 11
     },
     {
       "sku": "63480-VESPA-FAN-SILVER",
@@ -410,10 +410,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5755461084320371561",
       "warehouse": "MY-02",
       "stockId": "69",
-      "inventoryQuantity": 70,
+      "inventoryQuantity": 69,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 70
+      "available": 69
     },
     {
       "sku": "63480-CLICK-FAN-PURPLE",
@@ -443,10 +443,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5821002826033143106",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 85,
-      "occupationQuantity": 0,
+      "inventoryQuantity": 84,
+      "occupationQuantity": 1,
       "disabledQuantity": 2,
-      "available": 83
+      "available": 81
     },
     {
       "sku": "63480-Brake Cap-Red",
@@ -454,10 +454,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5821002288491142419",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 16,
+      "inventoryQuantity": 14,
       "occupationQuantity": 0,
       "disabledQuantity": 4,
-      "available": 12
+      "available": 10
     },
     {
       "sku": "63480-Brake Cap-Green",
@@ -498,10 +498,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5821002288675691124",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 86,
+      "inventoryQuantity": 80,
       "occupationQuantity": 1,
       "disabledQuantity": 11,
-      "available": 74
+      "available": 68
     },
     {
       "sku": "63480-Brake Cap-Black",
@@ -520,10 +520,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "63480-honda-Swingarm",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 100,
+      "inventoryQuantity": 99,
       "occupationQuantity": 0,
       "disabledQuantity": 2,
-      "available": 98
+      "available": 97
     },
     {
       "sku": "63480-oil dipstick-purple",
@@ -531,10 +531,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "63480-oil dipstick-purple",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 52,
+      "inventoryQuantity": 48,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 52
+      "available": 48
     },
     {
       "sku": "63480-Rear Footrest01-Sliver",
@@ -553,10 +553,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5797794988104357514",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 153,
+      "inventoryQuantity": 151,
       "occupationQuantity": 0,
       "disabledQuantity": 4,
-      "available": 149
+      "available": 147
     },
     {
       "sku": "63480-Rivets-Red",
@@ -597,10 +597,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5797795699982602613",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 24,
+      "inventoryQuantity": 23,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 24
+      "available": 23
     },
     {
       "sku": "63480-Rivets-Silver",
@@ -608,10 +608,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5797795388421313288",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 80,
+      "inventoryQuantity": 78,
       "occupationQuantity": 0,
       "disabledQuantity": 4,
-      "available": 76
+      "available": 74
     },
     {
       "sku": "63480-Rivets-Black",
@@ -652,10 +652,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5821001399776843639",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 50,
+      "inventoryQuantity": 49,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 50
+      "available": 49
     },
     {
       "sku": "63480-VESPA-FAN-PURPLE",
@@ -663,10 +663,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5755461722752161364",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 189,
-      "occupationQuantity": 0,
+      "inventoryQuantity": 188,
+      "occupationQuantity": 1,
       "disabledQuantity": 3,
-      "available": 186
+      "available": 184
     },
     {
       "sku": "63480-VESPA-FAN-RED",
@@ -674,10 +674,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5755460781529372219",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 53,
+      "inventoryQuantity": 52,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 53
+      "available": 52
     },
     {
       "sku": "63480-VESPA-FAN--Green ",
@@ -696,10 +696,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5755461576568084289",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 37,
+      "inventoryQuantity": 35,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 37
+      "available": 35
     },
     {
       "sku": "63480-VESPA-FAN-GOLD",
@@ -718,10 +718,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5755461392995981926",
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
-      "inventoryQuantity": 95,
+      "inventoryQuantity": 94,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 95
+      "available": 94
     },
     {
       "sku": "63480-VESPA-FAN-BLACK",
@@ -730,9 +730,9 @@ const SAMPLE_DATA = `{
       "warehouse": "PH-08",
       "stockId": "5875481328595456",
       "inventoryQuantity": 25,
-      "occupationQuantity": 0,
+      "occupationQuantity": 1,
       "disabledQuantity": 0,
-      "available": 25
+      "available": 24
     },
     {
       "sku": "63480-Brake Cap-Purple",
@@ -751,10 +751,10 @@ const SAMPLE_DATA = `{
       "goodsCode": "5821002288491142419",
       "warehouse": "TH-08",
       "stockId": "8372959489806848",
-      "inventoryQuantity": 30,
+      "inventoryQuantity": 29,
       "occupationQuantity": 0,
       "disabledQuantity": 0,
-      "available": 30
+      "available": 29
     },
     {
       "sku": "63480-Brake Cap-Green",
